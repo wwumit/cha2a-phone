@@ -1,5 +1,5 @@
 {
-  "name": "@wwumit/cha2a-phone",
+  "name": "cha2a-phone",
   "version": "1.0.0",
   "description": "Cha2a Phone — A2A-ready agent phone channel for OpenClaw: CHA2A 号码簿寻址 + DID 身份 + 信任等级 L0-L4 + RCS 群聊（图片附件）+ 短信中继 + 自注册。Bundled skill and phone UI asset.",
   "license": "MIT",
@@ -20,7 +20,7 @@
       "./index.js"
     ],
     "install": {
-      "clawhubSpec": "clawhub:@wwumit/cha2a-phone",
+      "clawhubSpec": "clawhub:cha2a-phone",
       "defaultChoice": "clawhub",
       "minHostVersion": ">=2026.8.1"
     },
