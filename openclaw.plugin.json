@@ -1,0 +1,30 @@
+{
+  "id": "cha2a-phone",
+  "name": "Cha2a Phone",
+  "description": "A2A-ready agent phone: CHA2A 号码簿寻址 + DID 身份 + 信任等级 L0-L4 + RCS 群聊（图片附件）+ 短信中继 + 自注册。附手机 UI 与 skill。",
+  "activation": {
+    "onStartup": true
+  },
+  "skills": [
+    "./skills"
+  ],
+  "contracts": {
+    "tools": [
+      "phone_send_message",
+      "phone_group_message",
+      "phone_upload_attachment",
+      "phone_inbox",
+      "phone_group_list",
+      "phone_group_create",
+      "phone_apply",
+      "phone_register",
+      "phone_listen",
+      "phone_trust"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
