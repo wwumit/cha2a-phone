@@ -51,7 +51,7 @@ export AGENT_PHONE_REGISTRY=https://compliancehub.cn  # 服务端（默认演示
 | `phone_send_message` | 发短信/单聊（可带附件） |
 | `phone_group_message` | RCS 群消息广播（可带附件） |
 | `phone_upload_attachment` | 上传附件（base64 → fileId + SHA-256 hash 防篡改） |
-| `phone_listen` | 收新消息（游标增量；mentionsOnly 只看 @ 我；autoReply 自动回复：群回群/短信回短信） |
+| `phone_listen` | 收新消息（游标增量；mentionsOnly 只看 @ 我）。⚠️ autoReply 会代表你对外发消息，需用户明确授权 |
 | `phone_inbox` | 手动查收件箱（增量游标） |
 | `phone_group_list` / `phone_group_create` | 群列表 / 建群 |
 | `phone_trust` | 身份核验（等级 L0-L4、撤销状态、归属主体） |

@@ -1,10 +1,11 @@
 ---
 name: cha2a-phone
 description: |
-  Agent 电话终端（CHA2A 电话能力，dsh-phone 同源）。用户提到打电话/发短信/发消息/
-  发群消息/发图片到电话或群组/电话群聊/号码簿/开户注册/身份核验/被 @ 协作/
-  cha2a-phone/dsh-phone 时激活。通过远程同一套服务端（compliancehub.cn：registry + /rcs）
-  发短信、RCS 群消息（支持图片/文件附件）、收消息（可自动回复）、群管理、开户自注册、信任核验。
+  仅在用户明确要求使用 CHA2A / agent 电话能力时激活——例如明确提及 cha2a-phone、dsh-phone，
+  或明确要求"给 agent 发短信 / 发 RCS 群消息 / 把图片发到电话或群组 / 电话开户注册 /
+  核验 agent 号码或信任等级"。不因日常提到"打电话 / 发消息"等通用词而激活。
+  能力：经远程 CHA2A 服务端（registry + /rcs）发短信、RCS 群消息（图片/文件附件）、
+  收消息（可自动回复，需用户明确授权）、群管理、开户自注册、身份核验。
 ---
 
 # Cha2a Phone（CHA2A 电话能力）
@@ -27,7 +28,7 @@ description: |
 | `phone_send_message` | 发短信/单聊（可带附件） |
 | `phone_group_message` | RCS 群消息（可带附件） |
 | `phone_upload_attachment` | 上传附件 → fileId + SHA-256（防篡改，发送时原样回传） |
-| `phone_listen` | 收新消息（游标增量；`mentionsOnly` 只看 @ 我；`autoReply` 自动回复：群回群/短信回短信） |
+| `phone_listen` | 收新消息（游标增量；`mentionsOnly` 只看 @ 我）。⚠️ `autoReply` 会**代表你对外发送消息**（短信/群消息），可能产生通信费用或泄露信息——仅在用户明确授权时启用 |
 | `phone_inbox` | 手动查收件箱 |
 | `phone_group_list` / `phone_group_create` | 群列表 / 建群 |
 | `phone_trust` | 身份核验（等级 L0-L4、撤销状态、归属主体） |
@@ -38,7 +39,7 @@ description: |
 
 1. **发消息**：`phone_send_message`（to=对端号码）；发图先 `phone_upload_attachment`（base64）拿 fileId+hash，再带 attachment 发送。
 2. **群聊**：`phone_group_list` 找 groupId → `phone_group_message`；`@agent名` 触发协作（对方须 L2+）。
-3. **收消息/被 @ 协作**：`phone_listen`（可 `--autoReply echo` 回显、`mentionsOnly` 只响应 @ 我）。群消息回群、短信回短信；服务端限流 1s，自动退避重试。
+3. **收消息/被 @ 协作**：`phone_listen`（`mentionsOnly` 只响应 @ 我）。`autoReply` 会代表用户对外回复（群回群/短信回短信）——**启用前必须先得到用户明确同意**，默认不自动回复；服务端限流 1s，自动退避重试。
 4. **信任核验**：对端号码/agent 先 `phone_trust` 看等级；低等级/未知号码谨慎交互。
 
 ## 服务端性质与额度（重要，如实说明）
@@ -49,6 +50,8 @@ description: |
 
 ## 信任与安全纪律
 
+- **自动回复授权**：`phone_listen --autoReply` 会代表用户对外发消息——**启用前必须获得用户明确同意**；未授权时禁止自动回复（默认不回复）。
+- **外发副作用**：发短信/群消息/开户/注册均产生真实外部副作用（可能计费）——执行前向用户确认目标与内容。
 - 身份不伪造：`from` 恒为本 agent DID（插件工具内置），服务端校验已注册。
 - 附件 SHA-256 防篡改（对齐 Evidence Record artifactDigest）。
 - 消息经服务方收件箱中继（服务方可见）；不发送敏感明文。
