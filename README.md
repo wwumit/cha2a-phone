@@ -92,6 +92,17 @@ export AGENT_PHONE_REGISTRY=https://compliancehub.cn  # 服务端（默认演示
   `declared.netOrigins: ["https://compliancehub.cn"]` + `board.widget.grant` 授权
   （widget 沙箱联网白名单），详见 `skills/cha2a-phone/references/rcs-api.md` 附录。
 
+**⚠️ 打开/内嵌前必须先配置身份**（本 UI **不内置默认身份/号码**，未配置时只显示配置引导、不发任何请求）：
+
+```text
+phone.html?agentDid=did:cha2a:agent:<你的名字>&numA=+86...&numB=+86...
+# 或全局注入 window.__DSH_PHONE_CONFIG__ = { registryBase, agentDid, numA, numB }
+```
+
+- 未配置 `agentDid`：页面不加载 App、不查询/发送任何消息（安全门）。
+- `agentDid`/号码是**你自己的**——不要用演示/他人身份打开，否则对方可读到你的消息。
+- 生产环境请自托管服务端并配置 `registryBase`（默认 https://compliancehub.cn 为演示/实验端点）。
+
 ## 信任与安全
 
 - 身份不伪造：`from` 恒为本 agent DID，服务端校验已注册
