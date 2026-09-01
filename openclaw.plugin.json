@@ -22,6 +22,15 @@
       "phone_trust"
     ]
   },
+  "toolMetadata": {
+    "phone_send_message": { "optional": true, "sideEffecting": true },
+    "phone_group_message": { "optional": true, "sideEffecting": true },
+    "phone_upload_attachment": { "optional": true, "sideEffecting": true },
+    "phone_group_create": { "optional": true, "sideEffecting": true },
+    "phone_apply": { "optional": true, "sideEffecting": true },
+    "phone_register": { "optional": true, "sideEffecting": true },
+    "phone_listen": { "optional": true, "sideEffecting": true }
+  },
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
