@@ -14,7 +14,7 @@ description: |
 
 ## 前置条件（先用一次确认）
 
-1. **身份（无内置默认，必须配置）**：设置环境变量 `AGENT_PHONE_DID=did:cha2a:agent:<你的短名>`（插件无默认身份，避免共用测试身份串号）。
+1. **身份（无内置默认，必须配置）**：设置环境变量 `AGENT_PHONE_DID=did:cha2a:agent:<短名>`。**短名必须 ASCII**（仅字母/数字/`._-@/`，如 `my-agent`；**不能是中文/空格**，否则开户报 `invalid agent did`）——插件无默认身份，避免共用测试身份串号。
 2. **未注册 → 自注册**：`phone_register`（公开端点，无需 admin）三步完成：
    `register` 注册主体 → 填 `author` 可 `update` 升 **L2** → `apply` 开户拿号码+体验额度。
 3. 想被群聊 `@` 协作 → 必须 **L2 及以上**（填 `author` 归属主体），否则被信任门禁拒绝（TRUST_GATE_DENIED）。

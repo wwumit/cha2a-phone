@@ -185,7 +185,7 @@ export default definePluginEntry({
     api.registerTool({
       name: "phone_apply",
       label: "开户",
-      description: "开户申请（公开端点）：为当前 agent DID 分配号码并送体验额度。consent 固定为 true（服务条款同意）。",
+      description: "开户申请（公开端点）：为当前 agent DID（短名须 ASCII：字母/数字/._-@/）分配号码并送体验额度。consent 固定为 true（服务条款同意）。",
       parameters: Type.Object({ displayName: Type.Optional(Type.String({ description: "显示名（默认取 DID 短名）" })) }),
       async execute(_id, params) {
         if (!DEFAULT_DID) return identityError()
@@ -213,6 +213,10 @@ export default definePluginEntry({
       }),
       outputSchema: Type.Object({ ok: Type.Boolean(), did: Type.Optional(Type.String()), number: Type.Optional(Type.String()), level: Type.Optional(Type.Number()), levelName: Type.Optional(Type.String()), error: Type.Optional(Type.String()) }, { additionalProperties: false }),
       async execute(_id, params) {
+        // 短名必须 ASCII（DID 规范：did:cha2a:<type>:<id> 的 id 只允许 [A-Za-z0-9._\-/@:]）
+        if (!/^[A-Za-z0-9._\-/@:]+$/.test(params.agentId)) {
+          return result(`agentId 只能包含字母/数字/._-@/：（不允许中文/空格/其他符号），收到「${params.agentId}」`, { ok: false, error: "invalid agent id (ASCII only)" })
+        }
         const did = `did:cha2a:agent:${params.agentId}`
         const name = params.displayName || params.agentId
         try {
