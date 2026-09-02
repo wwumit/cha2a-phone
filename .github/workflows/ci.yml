@@ -36,3 +36,18 @@ jobs:
           test -z "$(find . -name '*.bak*' -not -path './.git/*')" || { echo "✗ 发现备份工件"; exit 1; }
           grep -q '"version"' package.json || { echo "✗ package.json 缺 version"; exit 1; }
           echo "✓ 结构完整、无备份工件"
+      - name: 工具契约一致性（index.js registerTool = openclaw.plugin.json contracts）
+        run: |
+          python3 - <<'PY'
+          import json, re
+          tools = json.load(open('openclaw.plugin.json'))['contracts']['tools']
+          names = re.findall(r'registerTool\(\{\s*name:\s*"([^"]+)"', open('index.js', encoding='utf-8').read())
+          missing = [t for t in tools if t not in names]
+          extra = [n for n in names if n not in tools]
+          if missing or extra:
+              print('✗ contracts:', tools)
+              print('✗ registered:', names)
+              print('✗ missing:', missing, 'extra:', extra)
+              raise SystemExit(1)
+          print(f'✓ 工具契约一致：{len(tools)} 个 tools 全部注册')
+          PY

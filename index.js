@@ -2,7 +2,7 @@
  * cha2a-phone — OpenClaw 插件（CHA2A 电话能力）
  *
  * 提供结构化 phone_* 工具（发短信/群消息/附件/收件箱/群管理/开户/自注册/收消息/信任核验），
- * 直调远程服务端（registry + /rcs，默认 https://compliancehub.cn 演示服务端），
+ * 直调远程服务端（registry + /rcs，默认 https://compliancehub.cn——CHA2A 公共注册/认证服务），
  * 附带 skill（指令）与手机 UI 资源（assets/phone.html）。
  *
  * 身份配置（无内置默认，避免串号）：
@@ -54,7 +54,7 @@ export default definePluginEntry({
       label: "发短信",
       description: "通过 CHA2A 电话通道发送短信/单聊消息（可带已上传的图片/文件附件）。to 为对端号码（4-15 位，可带 +）。",
       parameters: Type.Object({
-        to: Type.String({ description: "对端号码，如 +86951230001" }),
+        to: Type.String({ description: "对端号码（E.164），如 +8613800138000（示例号码）" }),
         text: Type.Optional(Type.String({ description: "消息文本（与附件二选一或同发）" })),
         attachment: Type.Optional(Type.Object({
           fileId: Type.String(), name: Type.String(), size: Type.Optional(Type.Number()), hash: Type.String(),
