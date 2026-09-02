@@ -277,13 +277,15 @@ export default definePluginEntry({
             cursor = Math.max(cursor, m.seq || 0)
             const text = String(m.text || "")
             if (params.mentionsOnly && !text.includes(`@${short}`) && !text.includes(did)) continue
-            const entry = { seq: m.seq, tag: m.groupId ? "群" : "短信", from: m.fromNumber || m.from, groupId: m.groupId || null, text: text.slice(0, 200) }
+            // @协作短信投递（payload.source=group）→ 视为群消息，回复回群；普通短信回短信
+            const gid = m.groupId || (m.payload && m.payload.source === "group" ? m.payload.groupId : null)
+            const entry = { seq: m.seq, tag: gid ? "群" : "短信", from: m.fromNumber || m.from, groupId: gid || null, text: text.slice(0, 200) }
             // 自动回复（群回群 / 短信回短信；服务端限流 1s，退避 + 重试一次）
             if (params.autoReply && text.trim()) {
               const reply = params.autoReply === "echo" ? `[agent回复·${short}] 收到：${text}` : params.autoReply
               await new Promise((r) => setTimeout(r, 1300))
               const attempt = async () => {
-                if (m.groupId) {
+                if (gid) {
                   return jsonFetch(`${RCS}/api/v1/phone/group/message`, { method: "POST", body: JSON.stringify({ from: did, groupId: m.groupId, text: reply }) })
                 }
                 const toNum = String(m.fromNumber || "").replace(/[^0-9+]/g, "")
