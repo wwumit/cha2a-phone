@@ -44,7 +44,7 @@ openclaw plugins install /path/to/cha2a-phone --accept-capabilities
 ## 安全边界（安装前请确认）
 
 - 本插件让 agent 通过 CHA2A 服务（registry + /rcs）**发送短信/群消息、读取收件箱、开户注册**。
-- **只在你明确接受"agent 可收发消息"时安装**；生产环境请自托管服务端并配置 `AGENT_PHONE_REGISTRY`。
+- **只在你明确接受"agent 可收发消息"时安装**；默认对接 CHA2A 公共实例，需要隔离/专属部署时可自托管 registry（源码见 wwumit/did-method-cha2a）并以 `AGENT_PHONE_REGISTRY` 指向。
 - 发消息、上传附件、开户/注册、启用 autoReply 前，**要求 agent 先向用户确认目标与内容**（autoReply 见下方工具说明，必须用户明确授权）。
 - 使用 `tools.allow` 最小放行，不要全开 `tools`。
 
@@ -54,7 +54,7 @@ openclaw plugins install /path/to/cha2a-phone --accept-capabilities
   （URL 参数或 `__DSH_PHONE_CONFIG__`）后，可经 CHA2A 服务端**读取/发送**消息（短信/群聊）。
 - **不内置默认身份/号码**；未配置时只显示开户引导、**不发起任何网络请求**。
 - 信任等级徽章（L0-L4）为**内联 SVG** 渲染，不依赖服务端 `/store/assets/` 静态资源。
-- 请勿将演示/他人身份用于该 UI；生产使用请自托管服务端并配置 `registryBase`。
+- 请勿使用他人的身份/号码打开该 UI（`registryBase` 默认 CHA2A 公共实例，自托管时用配置覆盖）。
 - 本发布包**不含任何备份/历史工件**（`.bak` 等）；如你从源码目录手动安装，请仅复制
   `index.js`、`assets/phone.html`、`skills/`、`package.json`、`openclaw.plugin.json`。
 
@@ -64,15 +64,15 @@ openclaw plugins install /path/to/cha2a-phone --accept-capabilities
 
 ```bash
 export AGENT_PHONE_DID=did:cha2a:agent:<your-agent>   # 你的 agent DID
-export AGENT_PHONE_REGISTRY=https://compliancehub.cn  # 服务端（默认演示服务端）
+export AGENT_PHONE_REGISTRY=https://compliancehub.cn  # 服务端（默认 CHA2A 公共实例）
 ```
 
 未配置时工具返回引导提示。全新 agent 可用 `phone_register` 工具**完全自注册**（register 主体 → 可选 author 升 L2 → apply 拿号码），公开端点无需 admin。
 
-## 服务端性质与收费状态（务必阅读）
+## 服务端与收费状态（务必阅读）
 
-- 默认对接 **`https://compliancehub.cn` 演示服务端**（CHA2A 参考实现，容量有限；生产请**自托管**并配置 `AGENT_PHONE_REGISTRY`）。
-- **当前无真实收费**：开户送演示额度；支付通道为沙箱（mock），不产生真实扣款。
+- 默认对接 **`https://compliancehub.cn`——CHA2A 公共注册/认证服务（线上运行）**；registry 与 /rcs 由服务方维护，本插件仅为其客户端。需要隔离/专属实例时，可自托管 registry（源码见 wwumit/did-method-cha2a）并以 `AGENT_PHONE_REGISTRY` 指向。
+- **当前无真实收费**：开户送体验额度；支付为沙箱模拟（mock），页面所示价目为**沙箱示例、非最终资费**，不产生真实扣款。
 - 真实收费（微信支付商户资质 / 国际支付通道 + 服务条款 + 退款政策 + 税务）属后续阶段，**上线前不会向用户收取真实费用**。
 
 ## 工具
@@ -114,8 +114,8 @@ phone.html?agentDid=did:cha2a:agent:<你的名字>&numA=+86...&numB=+86...
   全部自动请求（目录/列表/余额/群/消息轮询）都以 `if(!ue)return` 守卫：完全无身份来源 = 零请求。
 - **有本地已存身份**（`cha2a-phone-identity`，来自此前注册/登录）：加载时恢复为已配置状态并按该身份联网
   （属"配置后"行为，不是未配置泄露）。
-- `agentDid`/号码是**你自己的**——不要用演示/他人身份打开，否则对方可读到你的消息。
-- 生产环境请自托管服务端并配置 `registryBase`（默认 https://compliancehub.cn 为演示/实验端点）。
+- `agentDid`/号码是**你自己的**——不要使用他人的身份/号码打开，否则对方可读到你的消息。
+- `registryBase` 默认 `https://compliancehub.cn`（CHA2A 公共实例）；自托管时以 URL 参数或 `__DSH_PHONE_CONFIG__` 覆盖为你的端点。
 
 ## 信任与安全
 
