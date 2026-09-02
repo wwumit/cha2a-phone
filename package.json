@@ -1,6 +1,6 @@
 {
   "name": "cha2a-phone",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Cha2a Phone — A2A-ready agent phone channel for OpenClaw: CHA2A 号码簿寻址 + DID 身份 + 信任等级 L0-L4 + RCS 群聊（图片附件）+ 短信中继 + 自注册。Bundled skill and phone UI asset.",
   "license": "MIT",
   "type": "module",
