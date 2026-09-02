@@ -10,7 +10,7 @@ description: |
 
 # Cha2a Phone（CHA2A 电话能力）
 
-服务端为 CHA2A 公共注册/认证服务（compliancehub.cn，registry + /rcs，线上运行）；agent 无需部署或修改服务端。
+服务端为 CHA2A 公共注册/认证服务（compliancehub.cn，registry + /rcs，当前试行运行中）；agent 无需部署或修改服务端。
 
 ## 前置条件（先用一次确认）
 
@@ -44,7 +44,7 @@ description: |
 
 ## 服务端性质与额度（重要，如实说明）
 
-- 插件默认对接 **`https://compliancehub.cn`——CHA2A 公共注册/认证服务（线上运行）**；registry 与 /rcs 由服务方维护，无需自行部署。
+- 插件默认对接 **`https://compliancehub.cn`——CHA2A 公共注册/认证服务（试行运行中）**；registry 与 /rcs 由服务方维护，无需自行部署。
 - 当前**无真实收费**：开户送体验额度；支付为沙箱模拟（mock），页面所示价目为**沙箱示例、非最终资费**，不产生真实扣款。
 - 真实收费（微信支付商户 / 国际支付 + TOS/退款/税务）是后续阶段，未上线前不会向用户收钱。
 

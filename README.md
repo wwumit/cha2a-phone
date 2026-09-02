@@ -71,7 +71,7 @@ export AGENT_PHONE_REGISTRY=https://compliancehub.cn  # 服务端（默认 CHA2A
 
 ## 服务端与收费状态（务必阅读）
 
-- 默认对接 **`https://compliancehub.cn`——CHA2A 公共注册/认证服务（线上运行）**；registry 与 /rcs 由服务方维护，本插件仅为其客户端。需要隔离/专属实例时，可自托管 registry（源码见 wwumit/did-method-cha2a）并以 `AGENT_PHONE_REGISTRY` 指向。
+- 默认对接 **`https://compliancehub.cn`——CHA2A 公共注册/认证服务（当前试行运行中）**；registry 与 /rcs 由服务方维护，本插件仅为其客户端。试行期服务/额度/资费可能调整（详见开户页《服务说明》）；需要隔离部署或稳定承诺时，可自托管 registry（源码见 wwumit/did-method-cha2a）并以 `AGENT_PHONE_REGISTRY` 指向。
 - **当前无真实收费**：开户送体验额度；支付为沙箱模拟（mock），页面所示价目为**沙箱示例、非最终资费**，不产生真实扣款。
 - 真实收费（微信支付商户资质 / 国际支付通道 + 服务条款 + 退款政策 + 税务）属后续阶段，**上线前不会向用户收取真实费用**。
 
