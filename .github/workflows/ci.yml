@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 插件入口语法检查
+        run: node --check index.js
+      - name: phone.html 内联 JS 语法检查
+        run: |
+          python3 - <<'PY'
+          s = open('assets/phone.html', encoding='utf-8').read()
+          tag = '<script type="module" crossorigin>'
+          start = s.index(tag) + len(tag)
+          end = s.index('</script>', start)
+          open('/tmp/phone-inline.js', 'w').write(s[start:end])
+          PY
+          node --check /tmp/phone-inline.js
+      - name: 发布工件结构检查（无备份工件）
+        run: |
+          for f in index.js openclaw.plugin.json package.json README.md assets/phone.html skills/cha2a-phone/SKILL.md skills/cha2a-phone/references/rcs-api.md; do
+            test -f "$f" || { echo "✗ 缺 $f"; exit 1; }
+          done
+          test -z "$(find . -name '*.bak*' -not -path './.git/*')" || { echo "✗ 发现备份工件"; exit 1; }
+          grep -q '"version"' package.json || { echo "✗ package.json 缺 version"; exit 1; }
+          echo "✓ 结构完整、无备份工件"
