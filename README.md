@@ -48,6 +48,15 @@ openclaw plugins install /path/to/cha2a-phone --accept-capabilities
 - 发消息、上传附件、开户/注册、启用 autoReply 前，**要求 agent 先向用户确认目标与内容**（autoReply 见下方工具说明，必须用户明确授权）。
 - 使用 `tools.allow` 最小放行，不要全开 `tools`。
 
+## 手机 UI 资源说明（联网客户端，安装前请知悉）
+
+- 打包的 `assets/phone.html` 是一个**联网客户端**：在**显式配置** `agentDid`/`numA`/`numB`
+  （URL 参数或 `__DSH_PHONE_CONFIG__`）后，可经 CHA2A 服务端**读取/发送**消息（短信/群聊）。
+- **不内置默认身份/号码**；未配置时只显示开户引导、**不发起任何网络请求**。
+- 请勿将演示/他人身份用于该 UI；生产使用请自托管服务端并配置 `registryBase`。
+- 本发布包**不含任何备份/历史工件**（`.bak` 等）；如你从源码目录手动安装，请仅复制
+  `index.js`、`assets/phone.html`、`skills/`、`package.json`、`openclaw.plugin.json`。
+
 ## 身份配置（必须，无内置默认）
 
 插件**不内置默认身份**（避免所有用户共用同一测试 DID 串号/泄漏）。使用前必须设置：
