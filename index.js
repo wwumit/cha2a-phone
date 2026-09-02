@@ -27,10 +27,15 @@ function identityError() {
 }
 
 async function jsonFetch(url, init) {
-  const r = await fetch(url, { ...init, headers: { "Content-Type": "application/json", Accept: "application/json", ...(init?.headers || {}) } })
-  let body = null
-  try { body = await r.json() } catch { body = null }
-  return { status: r.status, body }
+  // P2: 超时 12s（防工具无限挂起）；超时抛错 → 调用方 catch 报错
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 12000)
+  try {
+    const r = await fetch(url, { ...init, signal: ctrl.signal, headers: { "Content-Type": "application/json", Accept: "application/json", ...(init?.headers || {}) } })
+    let body = null
+    try { body = await r.json() } catch { body = null }
+    return { status: r.status, body }
+  } finally { clearTimeout(timer) }
 }
 
 /** 工具结果统一封装 */
@@ -135,6 +140,7 @@ export default definePluginEntry({
 
         try {
           const { status, body } = await jsonFetch(`${RCS}/api/v1/phone/messages?did=${encodeURIComponent(DEFAULT_DID)}&since=${params.since || 0}`)
+          if (status >= 400) return result(`收件箱查询失败: ${body?.error || `HTTP ${status}`}`, { ok: false, error: body?.error || `HTTP ${status}` })
           const msgs = body?.messages || []
           const text = msgs.length ? msgs.slice(0, 10).map((m) => `[${m.fromNumber || m.from}] ${(m.text || (m.attachment ? `📎 ${m.attachment.name}` : "")).slice(0, 80)}`).join("\n") : "（无消息）"
           return result(`收件箱 ${msgs.length} 条：\n${text}`, { ok: true, count: msgs.length })
@@ -149,6 +155,7 @@ export default definePluginEntry({
       description: "列出本 agent 加入的 RCS 群。",
       parameters: Type.Object({}),
       async execute() {
+        if (!DEFAULT_DID) return identityError()   // P1-2: 与其余 9 工具一致——未配置时零请求
         try {
           const { status, body } = await jsonFetch(`${RCS}/api/v1/phone/group/list?did=${encodeURIComponent(DEFAULT_DID)}`)
           const groups = body?.groups || []
@@ -185,10 +192,14 @@ export default definePluginEntry({
     api.registerTool({
       name: "phone_apply",
       label: "开户",
-      description: "开户申请（公开端点）：为当前 agent DID（短名须 ASCII：字母/数字/._-@/）分配号码并送体验额度。consent 固定为 true（服务条款同意）。",
-      parameters: Type.Object({ displayName: Type.Optional(Type.String({ description: "显示名（默认取 DID 短名）" })) }),
+      description: "开户申请（公开端点）：为当前 agent DID（短名须 ASCII：字母/数字/._-@/）分配号码并送体验额度。**开户即同意服务条款**——仅当用户明确同意后调用，并以 consent:true 显式确认（P2：不再静默代用户同意）。",
+      parameters: Type.Object({
+        displayName: Type.Optional(Type.String({ description: "显示名（默认取 DID 短名）" })),
+        consent: Type.Optional(Type.Boolean({ description: "是否同意服务条款——**仅当用户明确同意时传 true**；缺省/非 true 不执行开户" })),
+      }),
       async execute(_id, params) {
         if (!DEFAULT_DID) return identityError()
+        if (params.consent !== true) return result("开户需先获得用户明确同意（服务条款）——确认后以 consent:true 重试", { ok: false, error: "consent required" })
 
         try {
           const { status, body } = await jsonFetch(`${REGISTRY}/api/v1/phone/apply`, {
@@ -286,7 +297,7 @@ export default definePluginEntry({
               await new Promise((r) => setTimeout(r, 1300))
               const attempt = async () => {
                 if (gid) {
-                  return jsonFetch(`${RCS}/api/v1/phone/group/message`, { method: "POST", body: JSON.stringify({ from: did, groupId: m.groupId, text: reply }) })
+                  return jsonFetch(`${RCS}/api/v1/phone/group/message`, { method: "POST", body: JSON.stringify({ from: did, groupId: gid, text: reply }) })
                 }
                 const toNum = String(m.fromNumber || "").replace(/[^0-9+]/g, "")
                 if (!toNum) return { status: 400, body: { error: "no from number" } }
