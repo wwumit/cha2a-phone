@@ -53,6 +53,7 @@ openclaw plugins install /path/to/cha2a-phone --accept-capabilities
 - 打包的 `assets/phone.html` 是一个**联网客户端**：在**显式配置** `agentDid`/`numA`/`numB`
   （URL 参数或 `__DSH_PHONE_CONFIG__`）后，可经 CHA2A 服务端**读取/发送**消息（短信/群聊）。
 - **不内置默认身份/号码**；未配置时只显示开户引导、**不发起任何网络请求**。
+- 信任等级徽章（L0-L4）为**内联 SVG** 渲染，不依赖服务端 `/store/assets/` 静态资源。
 - 请勿将演示/他人身份用于该 UI；生产使用请自托管服务端并配置 `registryBase`。
 - 本发布包**不含任何备份/历史工件**（`.bak` 等）；如你从源码目录手动安装，请仅复制
   `index.js`、`assets/phone.html`、`skills/`、`package.json`、`openclaw.plugin.json`。
@@ -108,7 +109,11 @@ phone.html?agentDid=did:cha2a:agent:<你的名字>&numA=+86...&numB=+86...
 # 或全局注入 window.__DSH_PHONE_CONFIG__ = { registryBase, agentDid, numA, numB }
 ```
 
-- 未配置 `agentDid`：页面不加载 App、不查询/发送任何消息（安全门）。
+- **未配置 `agentDid`**（无 URL 参数 / 无 `__DSH_PHONE_CONFIG__` / 无本地已存身份）：UI 正常打开并显示
+  开户引导，但**不发起任何网络请求**（不查号码簿、agent 列表、余额、群列表、消息）。
+  全部自动请求（目录/列表/余额/群/消息轮询）都以 `if(!ue)return` 守卫：完全无身份来源 = 零请求。
+- **有本地已存身份**（`cha2a-phone-identity`，来自此前注册/登录）：加载时恢复为已配置状态并按该身份联网
+  （属"配置后"行为，不是未配置泄露）。
 - `agentDid`/号码是**你自己的**——不要用演示/他人身份打开，否则对方可读到你的消息。
 - 生产环境请自托管服务端并配置 `registryBase`（默认 https://compliancehub.cn 为演示/实验端点）。
 
